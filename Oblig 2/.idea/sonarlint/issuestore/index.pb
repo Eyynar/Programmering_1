@@ -1,0 +1,11 @@
+
+<
+Oppgave 1.py,6\d\6da0fdf67ec91375534e6398b83e65226072fe17
+<
+Oppgave 3.py,e\9\e9476081a42029313a0de53ed5e491230d059953
+<
+Oppgave 4.py,0\4\046759c572e4a2d55ad1f10c6fe1fae44212fb81
+<
+Oppgave 5.py,9\c\9c98431ef4f8b073169adf5ce0e5d74b45432590
+<
+Oppgave 2.py,d\f\dfbc0e7fbb2e459a77220f9e6e438b1b236f9f2d
