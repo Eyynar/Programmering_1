@@ -6,6 +6,4 @@
 <
 Oppgave 4.py,0\4\046759c572e4a2d55ad1f10c6fe1fae44212fb81
 <
-Oppgave 5.py,9\c\9c98431ef4f8b073169adf5ce0e5d74b45432590
-<
 Oppgave 2.py,d\f\dfbc0e7fbb2e459a77220f9e6e438b1b236f9f2d
