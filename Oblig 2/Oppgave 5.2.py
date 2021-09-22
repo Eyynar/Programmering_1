@@ -17,8 +17,8 @@ for h in range(number_of_rounds):
 
         total = 0
         for j in range(number_of_throws):
-            random_list = random.randint(0, len(points)-1)
-            score = points[random_list][random.randint(0, len(points[random_list])-1)]
+            point_selection = random.choice(points)
+            score = random.choice(point_selection)
             print(f"Throw {j + 1}: {score}")
             total += score
 
