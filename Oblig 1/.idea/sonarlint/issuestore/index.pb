@@ -1,0 +1,5 @@
+
+9
+	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+<
+Oppgave_5.py,2\2\220c76479fe49a5215cef8e45c8ff608679c80ca
