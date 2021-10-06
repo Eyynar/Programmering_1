@@ -16,6 +16,7 @@ def avg_rating(list_name):
 
 
 def print_by_release(list_name, year):
+    print(f"Movies released in or after {year}: ")
     for element in list_name:
         if element["year"] >= year:
             print(f"{element['title']} - {element['year']} has a rating of {element['rating']}")
@@ -28,6 +29,7 @@ def write_to_file(list_name, file_name):
 
 
 def read_file(file_name):
+    print("\nMovies read from file:")
     with open(file_name, "r") as file:
         content = file.read()
     print(content)
