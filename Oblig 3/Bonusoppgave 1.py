@@ -42,3 +42,6 @@ modify_list(list_movies, "Dune", 20221, 7, "change")
 print("\nList after adding more movies: ")
 for element in list_movies:
     print(element)
+
+
+list = [{"name:": "bmw", "år": 2001}]
