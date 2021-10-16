@@ -1,5 +1,7 @@
 import random
+import time
 
+# Dictionary som innehodler alle kort og deres tilhørende poengsummer.
 full_deck = {
     "Two of clubs": 2, "Three of clubs": 3, "Four of clubs": 4, "Five of clubs": 5, "Six of clubs": 6,
     "Seven of clubs": 7, "Eight of clubs": 8, "Nine of clubs": 9, "Ten of clubs": 10,
@@ -15,43 +17,54 @@ full_deck = {
     "Jack of spades": 10, "Queen of spades": 10, "King of spades": 10, "Ace of spades": 11,
 }
 
-
+# Funksjon som shuffler alle kortene for de skal deles ut.
 def shuffle_deck():
     deck = list(full_deck.keys())
     random.shuffle(deck)
     return deck
 
 
+# Funksjon som finner verdien til individuelle kort
 def card_value(card):
     return full_deck[card]
 
 
+# Funksjon som looper gjennom hånden og finenr den totale verdien
 def hand_value(hand):
     total = 0
     for card in hand:
         total += card_value(card)
+    if total >= 21 and any("Ace" in s for s in hand):
+        total -= 10
     return total
 
 
+# Funksjon for å trekke kort til hånden
 def draw_card(hand, deck):
     hand.append(deck.pop(0))
 
 
+# Funksjon som sammenligner spillers og dealers hånd for å bestemme spillets resultat.
 def match_result(hand1, hand2, bet):
     global chips
+    # Legger til chips hvis dealer buster.
     if hand_value(hand2) > 21:
-        print(f"The dealer busted, you won the game.")
         chips += bet
+        print(f"The dealer busted, you won the game. \nYou now have {chips} chips.")
+        # Legger til chips hvis spillerens hånd er større enn dealerens hånd.
     elif hand_value(hand1) > hand_value(hand2):
-        print(f"Your hand is higher than the dealers hand. You won the game.")
         chips += bet
+        print(f"Your hand is higher than the dealers hand. You won the game. \nYou now have {chips} chips.")
+        # Fjerner chips hvis dealerens hånd er større enn spillerns hånd.
     elif hand_value(hand1) < hand_value(hand2):
-        print(f"Your hand is lower than the dealers hand. You lost the game")
         chips -= bet
+        print(f"Your hand is lower than the dealers hand. You lost the game \nYou now have {chips} chips.")
+        # Endrer ingenting hvis det er uavgjort.
     elif hand_value(hand1) == hand_value(hand2):
         print(f"Your hand is equal to the dealers hand. Neither of you won or lost.")
 
 
+# Såør bruker om de vil spille omigjen.
 def rematch():
     user_input = str(input("\nWould you like to play again? (Y/N) "))
 
@@ -61,29 +74,60 @@ def rematch():
         global game
         game = True
         start_game()
+    else:
+        print("You have to enter either Y or N.")
+        rematch()
 
 
+# Funksjon som inneholder spiltles "start". Den resetter variabler og kaller på relevante funksjoner.
 def start_game():
     global chips
     player_hand = []
     dealer_hand = []
 
-    bet = int(input(f"You have {chips} chips. How many would you like to bet? "))
+    # Tar bet.
+    try:
+        bet = int(input(f"You have {chips} chips. How many would you like to bet? "))
+        if bet < 1:
+            print("You can't bet less than one chip.")
+            start_game()
+        elif bet > chips:
+            print("You can't bet more chips than you have.")
+            start_game()
+        else:
+            time.sleep(0.25)
+            print(f"You bet {chips} chips.")
+    except ValueError:
+        print("You have to enter an integer, try again!")
+        start_game()
 
+    # Shuffler og deler ut kort.
     shuffled_deck = shuffle_deck()
     draw_card(player_hand, shuffled_deck)
     draw_card(dealer_hand, shuffled_deck)
     draw_card(player_hand, shuffled_deck)
     draw_card(dealer_hand, shuffled_deck)
 
-    print(f"You have a {player_hand[0]} and a {player_hand[1]}, with a total of {hand_value(player_hand)} points.")
+    time.sleep(0.75)
+
+    print(f"\nYou have a {player_hand[0]} and a {player_hand[1]}, with a total of {hand_value(player_hand)} points.")
+
+    time.sleep(0.75)
+
     print(f"The dealer's visible card is a {dealer_hand[0]}, with a value of {card_value(dealer_hand[0])} points.")
 
+    # SJekker omspiller får blackjack på første to trekk.
     if hand_value(player_hand) == 21:
-        print(f"You got blackjack. You won")
-        chips += bet*2
+        chips += bet * 2
+        print(f"You got blackjack. Your chips doubled. \nYou now have {chips} chips.")
+
+        time.sleep(1)
+
         rematch()
 
+    time.sleep(1)
+
+    # While loop som inneholder logikk for hit og stand.
     global game
     while game:
         user_choice = str(input("\nDo you want to Hit or Stand? (H/S) "))
@@ -91,28 +135,44 @@ def start_game():
         if user_choice.upper() == "S":
             if hand_value(dealer_hand) < 17:
                 print("\nThe dealer draws cards until their hand has a value of 17 or greater.")
+
                 while hand_value(dealer_hand) < 17:
                     draw_card(dealer_hand, shuffled_deck)
 
             print(f"\nThe deal|ers hand contains the following cards:")
             for card in dealer_hand:
+                time.sleep(1)
                 print(f"- {card}")
 
             print(f"\nThe dealers hand has a value of {hand_value(dealer_hand)} points.")
             match_result(player_hand, dealer_hand, bet)
+            if chips <= 0:
+                exit("Game over.")
             game = False
+
+            time.sleep(1)
+
             rematch()
 
         elif user_choice.upper() == "H":
             draw_card(player_hand, shuffled_deck)
-            print(f"You drew a {player_hand[len(player_hand)-1]}. Yor total is now {hand_value(player_hand)} points.")
+            time.sleep(0.5)
+            print(f"You drew a {player_hand[len(player_hand)-1]}. Your total is now {hand_value(player_hand)} points.")
             if hand_value(player_hand) > 21:
+                time.sleep(0.25)
                 print(f"You busted. Game over.")
                 chips -= bet
                 game = False
+
+                time.sleep(1)
+
                 rematch()
 
+        else:
+            print("You have to enter H or S.")
 
+
+# setter chips og loop til standard før spillet starter
 chips = 5
 game = True
 if __name__ == '__main__':
