@@ -1,7 +1,6 @@
 import random
-import time
 
-# Dictionary som innehodler alle kort og deres tilhørende poengsummer.
+# Dictionary som inneholder alle kort og deres tilhørende poengsummer.
 full_deck = {
     "Two of clubs": 2, "Three of clubs": 3, "Four of clubs": 4, "Five of clubs": 5, "Six of clubs": 6,
     "Seven of clubs": 7, "Eight of clubs": 8, "Nine of clubs": 9, "Ten of clubs": 10,
@@ -16,6 +15,7 @@ full_deck = {
     "Seven of spades": 7, "Eight of spades": 8, "Nine of spades": 9, "Ten of spades": 10,
     "Jack of spades": 10, "Queen of spades": 10, "King of spades": 10, "Ace of spades": 11,
 }
+
 
 # Funksjon som shuffler alle kortene for de skal deles ut.
 def shuffle_deck():
@@ -95,7 +95,6 @@ def start_game():
             print("You can't bet more chips than you have.")
             start_game()
         else:
-            time.sleep(0.25)
             print(f"You bet {chips} chips.")
     except ValueError:
         print("You have to enter an integer, try again!")
@@ -108,24 +107,15 @@ def start_game():
     draw_card(player_hand, shuffled_deck)
     draw_card(dealer_hand, shuffled_deck)
 
-    time.sleep(0.75)
-
     print(f"\nYou have a {player_hand[0]} and a {player_hand[1]}, with a total of {hand_value(player_hand)} points.")
-
-    time.sleep(0.75)
-
     print(f"The dealer's visible card is a {dealer_hand[0]}, with a value of {card_value(dealer_hand[0])} points.")
 
-    # SJekker omspiller får blackjack på første to trekk.
+    # Sjekker om spiller får blackjack på første to trekk.
     if hand_value(player_hand) == 21:
         chips += bet * 2
-        print(f"You got blackjack. Your chips doubled. \nYou now have {chips} chips.")
-
-        time.sleep(1)
+        print(f"You got blackjack. Your bet was doubled. \nYou now have {chips} chips.")
 
         rematch()
-
-    time.sleep(1)
 
     # While loop som inneholder logikk for hit og stand.
     global game
@@ -141,7 +131,6 @@ def start_game():
 
             print(f"\nThe deal|ers hand contains the following cards:")
             for card in dealer_hand:
-                time.sleep(1)
                 print(f"- {card}")
 
             print(f"\nThe dealers hand has a value of {hand_value(dealer_hand)} points.")
@@ -150,21 +139,15 @@ def start_game():
                 exit("Game over.")
             game = False
 
-            time.sleep(1)
-
             rematch()
 
         elif user_choice.upper() == "H":
             draw_card(player_hand, shuffled_deck)
-            time.sleep(0.5)
             print(f"You drew a {player_hand[len(player_hand)-1]}. Your total is now {hand_value(player_hand)} points.")
             if hand_value(player_hand) > 21:
-                time.sleep(0.25)
                 print(f"You busted. Game over.")
                 chips -= bet
                 game = False
-
-                time.sleep(1)
 
                 rematch()
 
