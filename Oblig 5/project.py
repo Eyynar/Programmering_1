@@ -11,17 +11,26 @@ class Game:
         self.image = image
 
 
-def add_to_list(title, release, score, developer, image):
-    game_list.append(Game(title, release, score, developer, image).__dict__)
+def add_game(title, release, score, developer, image):
+    key = title
+    games[key] = Game(title, release, score, developer, image).__dict__
 
 
-game_list = []
+def edit_game(key, new_title, new_release, new_score, new_developer, new_image):
+    games[key]["title"] = new_title
+    games[key]["release"] = new_release
+    games[key]["score"] = new_score
+    games[key]["developer"] = new_developer
+    games[key]["image"] = new_image
 
-add_to_list("The Outer Wilds", 2019, 10, "blank", 2)
+
+games = {}
+
+add_game("The Outer Wilds", 2019, 10, "blank", 2)
 
 
 with open("test.json", "w") as output_file:
-    json.dump(game_list, output_file, indent=4)
+    json.dump(games, output_file, indent=4)
 
 
 with open("test.json", "r") as input_file:
