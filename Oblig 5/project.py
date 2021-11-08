@@ -34,10 +34,15 @@ def save_to_file():
         json.dump(games, output_file, indent=4)
 
 
+
+def save_game():
+    pass
+
+
 games = []
 
-add_game("The Outer Wilds", 2019, 10, "blank", 2)
-add_game("Hollow Knight", 2017, 10, "Team Cherry", 2)
+# add_game("The Outer Wilds", 2019, 10, "blank", 2)
+# add_game("Hollow Knight", 2017, 10, "Team Cherry", 2)
 
 window = tk.Tk()
 
@@ -57,13 +62,13 @@ with open("test.json", "r") as input_file:
         listbox.insert(i, games_list[i]["title"])
 
 
-canvas = tk.Canvas(window, width = 300, height = 300)
-canvas.pack()
-img = ImageTk.PhotoImage(Image.open("images/theouterwilds.jpg"))
-canvas.create_image(20, 20, anchor="nw", image=img)
-
 # Main frame
 main_frame = tk.Frame()
+
+# Cover
+canvas = tk.Canvas(main_frame, width = 300, height = 300)
+img = ImageTk.PhotoImage(Image.open("images/theouterwilds.jpg"))
+canvas.create_image(20, 20, anchor="nw", image=img)
 
 # Form labels
 lbl_movie_title = tk.Label(main_frame, text="Title:")
@@ -75,16 +80,17 @@ ent_movie_title = tk.Entry(main_frame)
 ent_movie_year = tk.Entry(main_frame)
 ent_movie_duration = tk.Entry(main_frame)
 
-# btn_save = tk.Button(main_frame, text="Save", command=save_movie)
+btn_save = tk.Button(main_frame, text="Save", command=save_game)
 
 
-lbl_movie_title.grid(row=0, column=0)
-lbl_movie_year.grid(row=1, column=0)
-lbl_movie_duration.grid(row=2, column=0)
-ent_movie_title.grid(row=0, column=1)
-ent_movie_year.grid(row=1, column=1)
-ent_movie_duration.grid(row=2, column=1)
-# btn_save.grid(row=3, column=0, columnspan=2)
+canvas.grid(row=0, column=0, columnspan=2)
+lbl_movie_title.grid(row=1, column=0)
+lbl_movie_year.grid(row=2, column=0)
+lbl_movie_duration.grid(row=3, column=0)
+ent_movie_title.grid(row=1, column=1)
+ent_movie_year.grid(row=2, column=1)
+ent_movie_duration.grid(row=3, column=1)
+btn_save.grid(row=4, column=0, columnspan=2)
 
 main_frame.pack()
 
