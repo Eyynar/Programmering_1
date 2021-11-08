@@ -5,5 +5,12 @@
         "score": 10,
         "developer": "blank",
         "image": 2
+    },
+    {
+        "title": "Hollow Knight",
+        "release": 2017,
+        "score": 10,
+        "developer": "Team Cherry",
+        "image": 2
     }
 ]
