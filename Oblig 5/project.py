@@ -40,6 +40,8 @@ def display_game(*args):
     ent_release.insert(0, game['release'])
     ent_score.delete(0, tk.END)
     ent_score.insert(0, game['score'])
+    ent_dev.delete(0, tk.END)
+    ent_dev.insert(0, game['developer'])
 
 
 def save_to_file():
@@ -83,11 +85,13 @@ cover_img = canvas.create_image(20, 20, anchor="nw", image=img_path)
 lbl_title = tk.Label(main_frame, text="Title:")
 lbl_release = tk.Label(main_frame, text="Released:")
 lbl_score = tk.Label(main_frame, text="Score:")
+lbl_dev = tk.Label(main_frame, text="Developed by:")
 
 # Form entries
 ent_title = tk.Entry(main_frame)
 ent_release = tk.Entry(main_frame)
 ent_score = tk.Entry(main_frame)
+ent_dev = tk.Entry(main_frame)
 
 btn_save = tk.Button(main_frame, text="Save", command=save_game)
 
@@ -95,10 +99,12 @@ canvas.grid(row=0, column=0, columnspan=2)
 lbl_title.grid(row=1, column=0)
 lbl_release.grid(row=2, column=0)
 lbl_score.grid(row=3, column=0)
+lbl_dev.grid(row=4, column=0)
 ent_title.grid(row=1, column=1)
 ent_release.grid(row=2, column=1)
 ent_score.grid(row=3, column=1)
-btn_save.grid(row=4, column=0, columnspan=2)
+ent_dev.grid(row=4, column=1)
+btn_save.grid(row=5, column=0, columnspan=2)
 
 main_frame.pack()
 
