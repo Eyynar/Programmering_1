@@ -2,6 +2,7 @@ import tkinter as tk
 import json
 from PIL import ImageTk, Image
 
+
 class Game:
     def __init__(self, title, release, score, developer, image):
         self.title = title
@@ -25,8 +26,16 @@ def edit_game(index, new_title, new_release, new_score, new_developer, new_image
     save_to_file()
 
 
-def display_game(event):
-    pass
+def display_game(*args):
+    game_key = listbox.curselection()[0]
+    game = games_list[game_key]
+
+    ent_title.delete(0, tk.END)
+    ent_title.insert(0, game['title'])
+    ent_release.delete(0, tk.END)
+    ent_release.insert(0, game['release'])
+    ent_score.delete(0, tk.END)
+    ent_score.insert(0, game['score'])
 
 
 def save_to_file():
@@ -34,15 +43,11 @@ def save_to_file():
         json.dump(games, output_file, indent=4)
 
 
-
 def save_game():
     pass
 
 
 games = []
-
-# add_game("The Outer Wilds", 2019, 10, "blank", 2)
-# add_game("Hollow Knight", 2017, 10, "Team Cherry", 2)
 
 window = tk.Tk()
 
@@ -55,7 +60,7 @@ listbox_frame.pack(side=tk.LEFT)
 
 listbox.bind("<<ListboxSelect>>", display_game)
 
-# Legger til elementer i lista
+# Inserts games from the list into the Listbox
 with open("test.json", "r") as input_file:
     games_list = json.load(input_file)
     for i in range(len(games_list)):
@@ -66,33 +71,31 @@ with open("test.json", "r") as input_file:
 main_frame = tk.Frame()
 
 # Cover
-canvas = tk.Canvas(main_frame, width = 300, height = 300)
-img = ImageTk.PhotoImage(Image.open("images/theouterwilds.jpg"))
+canvas = tk.Canvas(main_frame, width=300, height=300)
+img = ImageTk.PhotoImage(Image.open(games_list[0]["image"]))
 canvas.create_image(20, 20, anchor="nw", image=img)
 
 # Form labels
-lbl_movie_title = tk.Label(main_frame, text="Title:")
-lbl_movie_year = tk.Label(main_frame, text="Year:")
-lbl_movie_duration = tk.Label(main_frame, text="Duration:")
+lbl_title = tk.Label(main_frame, text="Title:")
+lbl_release = tk.Label(main_frame, text="Released:")
+lbl_score = tk.Label(main_frame, text="Score:")
 
 # Form entries
-ent_movie_title = tk.Entry(main_frame)
-ent_movie_year = tk.Entry(main_frame)
-ent_movie_duration = tk.Entry(main_frame)
+ent_title = tk.Entry(main_frame)
+ent_release = tk.Entry(main_frame)
+ent_score = tk.Entry(main_frame)
 
 btn_save = tk.Button(main_frame, text="Save", command=save_game)
 
-
 canvas.grid(row=0, column=0, columnspan=2)
-lbl_movie_title.grid(row=1, column=0)
-lbl_movie_year.grid(row=2, column=0)
-lbl_movie_duration.grid(row=3, column=0)
-ent_movie_title.grid(row=1, column=1)
-ent_movie_year.grid(row=2, column=1)
-ent_movie_duration.grid(row=3, column=1)
+lbl_title.grid(row=1, column=0)
+lbl_release.grid(row=2, column=0)
+lbl_score.grid(row=3, column=0)
+ent_title.grid(row=1, column=1)
+ent_release.grid(row=2, column=1)
+ent_score.grid(row=3, column=1)
 btn_save.grid(row=4, column=0, columnspan=2)
 
 main_frame.pack()
-
 
 window.mainloop()
