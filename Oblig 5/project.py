@@ -67,8 +67,8 @@ listbox.bind("<<ListboxSelect>>", display_game)
 # Inserts games from the list into the Listbox
 with open("test.json", "r") as input_file:
     games_list = json.load(input_file)
-    for i in range(len(games_list)):
-        listbox.insert(i, games_list[i]["title"])
+    for game in games_list:
+        listbox.insert(tk.END, game["title"])
 
 
 # Main frame
