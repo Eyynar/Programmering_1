@@ -27,8 +27,12 @@ def edit_game(index, new_title, new_release, new_score, new_developer, new_image
 
 
 def display_game(*args):
+    global img_path
     game_key = listbox.curselection()[0]
     game = games_list[game_key]
+
+    img_path = ImageTk.PhotoImage(Image.open(games_list[game_key]["image"]))
+    canvas.itemconfigure(cover_img, image=img_path)
 
     ent_title.delete(0, tk.END)
     ent_title.insert(0, game['title'])
@@ -72,8 +76,8 @@ main_frame = tk.Frame()
 
 # Cover
 canvas = tk.Canvas(main_frame, width=300, height=300)
-img = ImageTk.PhotoImage(Image.open(games_list[0]["image"]))
-canvas.create_image(20, 20, anchor="nw", image=img)
+img_path = ImageTk.PhotoImage(Image.open(games_list[0]["image"]))
+cover_img = canvas.create_image(20, 20, anchor="nw", image=img_path)
 
 # Form labels
 lbl_title = tk.Label(main_frame, text="Title:")
