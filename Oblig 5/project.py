@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import json
 from PIL import ImageTk, Image
 
@@ -18,13 +19,25 @@ def add_game(title, genre, release, score, developer, image):
     save_to_file()
 
 
-def edit_game(index, new_title, new_genre, new_release, new_score, new_developer, new_image):
+def edit_game(*args):
+    try:
+        index = listbox.curselection()[0]
+    except IndexError:
+        index = 0
+
+    new_title = ent_title.get()
+    new_genre = ent_genre.get()
+    new_release = ent_release.get()
+    new_score = ent_score.get()
+    new_developer = ent_dev.get()
+    # new_image = ent_ima.get()
+
     games[index]["title"] = new_title
     games[index]["genre"] = new_genre
     games[index]["release"] = new_release
     games[index]["score"] = new_score
     games[index]["developer"] = new_developer
-    games[index]["image"] = new_image
+    # games[index]["image"] = new_image
     save_to_file()
 
 
@@ -53,32 +66,57 @@ def save_to_file():
         json.dump(games, output_file, indent=4)
 
 
-def save_game():
-    pass
-
-
 def delete_game():
-    game_key = listbox.curselection()[0]
-    del games[game_key]
-    listbox.delete(game_key)
-    save_to_file()
+    try:
+        game_key = listbox.curselection()[0]
+        del games[game_key]
+        listbox.delete(game_key)
+        save_to_file()
+    except IndexError:
+        pass
 
 
+# List that contains all stored games
 games = []
 
 window = tk.Tk()
+window.resizable(False, False)
 
-# Listbox og frame
-listbox_frame = tk.Frame()
+# The parent for all tabs
+frame_parent = ttk.Notebook(window)
 
-btn_add = tk.Button(listbox_frame, text="Add game")
-btn_add.pack(pady=5)
+# Main and info tabs
+main_frame = tk.Frame(frame_parent)
+add_frame = tk.Frame(frame_parent)
 
-listbox = tk.Listbox(listbox_frame)
-listbox.pack()
+frame_parent.add(main_frame, text="All games")
+frame_parent.add(add_frame, text="Add games")
+
+frame_parent.pack(fill=tk.BOTH, expand=1)
+
+# Widgets for the "All games" page
+# Frame for listbox and delete button
+listbox_frame = tk.Frame(main_frame)
+listbox_frame.pack(side=tk.LEFT)
+
+# Listbox
+listbox = tk.Listbox(listbox_frame, height=20)
 listbox.bind("<<ListboxSelect>>", display_game)
 
-listbox_frame.pack(side=tk.LEFT)
+# Listbox scrollbar
+listbox_scrollbar = tk.Scrollbar(listbox_frame)
+
+listbox.config(yscrollcommand=listbox_scrollbar.set)
+listbox_scrollbar.config(command=listbox.yview)
+
+# Delete button
+btn_delete = tk.Button(listbox_frame, text="Delete selected", command=delete_game)
+
+# Placing the widgets in the grid
+listbox.grid(row=0, column=0)
+listbox_scrollbar.grid(row=0, column=1, sticky="NS")
+btn_delete.grid(row=1, column=0)
+
 
 # Inserts games from the list into the Listbox
 with open("test.json", "r") as input_file:
@@ -88,33 +126,32 @@ with open("test.json", "r") as input_file:
         listbox.insert(tk.END, game["title"])
 
 
-btn_delete = tk.Button(listbox_frame, text="Delete selected", command=delete_game)
-btn_delete.pack(pady=5)
-
-# Main frame
-main_frame = tk.Frame()
+# Frame that contains all the game info
+info_frame = tk.Frame(main_frame)
 
 # Cover
-canvas = tk.Canvas(main_frame, width=225, height=225)
+canvas = tk.Canvas(info_frame, width=225, height=225)
 img_path = ImageTk.PhotoImage(Image.open(games_list[0]["image"]))
 cover_img = canvas.create_image(0, 0, anchor="nw", image=img_path)
 
 # Form labels
-lbl_title = tk.Label(main_frame, text="Title:")
-lbl_genre = tk.Label(main_frame, text="Genre:")
-lbl_release = tk.Label(main_frame, text="Released:")
-lbl_score = tk.Label(main_frame, text="Score:")
-lbl_dev = tk.Label(main_frame, text="Developed by:")
+lbl_title = tk.Label(info_frame, text="Title:")
+lbl_genre = tk.Label(info_frame, text="Genre:")
+lbl_release = tk.Label(info_frame, text="Released:")
+lbl_score = tk.Label(info_frame, text="Score:")
+lbl_dev = tk.Label(info_frame, text="Developed by:")
 
 # Form entries
-ent_title = tk.Entry(main_frame)
-ent_genre = tk.Entry(main_frame)
-ent_release = tk.Entry(main_frame)
-ent_score = tk.Entry(main_frame)
-ent_dev = tk.Entry(main_frame)
+ent_title = tk.Entry(info_frame)
+ent_genre = tk.Entry(info_frame)
+ent_release = tk.Entry(info_frame)
+ent_score = tk.Entry(info_frame)
+ent_dev = tk.Entry(info_frame)
 
-btn_save = tk.Button(main_frame, text="Save", command=save_game)
+# Save button
+btn_save = tk.Button(info_frame, text="Save", command=edit_game)
 
+# Positioning all of the elements in the grid.
 canvas.grid(row=0, column=0, columnspan=2)
 lbl_title.grid(row=1, column=0)
 lbl_genre.grid(row=2, column=0)
@@ -128,6 +165,17 @@ ent_score.grid(row=4, column=1)
 ent_dev.grid(row=5, column=1)
 btn_save.grid(row=6, column=0, columnspan=2)
 
-main_frame.pack()
+info_frame.pack()
+
+# Inserts details form the first game onto the page.
+ent_title.insert(0, games[0]['title'])
+ent_genre.insert(0, games[0]['genre'])
+ent_release.insert(0, games[0]['release'])
+ent_score.insert(0, games[0]['score'])
+ent_dev.insert(0, games[0]['developer'])
+
+
+# Widgets for the "Add games" page
+form_frame = tk.Frame(add_frame)
 
 window.mainloop()
