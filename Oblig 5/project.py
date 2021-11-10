@@ -57,25 +57,39 @@ def save_game():
     pass
 
 
+def delete_game():
+    game_key = listbox.curselection()[0]
+    del games[game_key]
+    listbox.delete(game_key)
+    save_to_file()
+
+
 games = []
 
 window = tk.Tk()
 
 # Listbox og frame
 listbox_frame = tk.Frame()
+
+btn_add = tk.Button(listbox_frame, text="Add game")
+btn_add.pack(pady=5)
+
 listbox = tk.Listbox(listbox_frame)
-
 listbox.pack()
-listbox_frame.pack(side=tk.LEFT)
-
 listbox.bind("<<ListboxSelect>>", display_game)
+
+listbox_frame.pack(side=tk.LEFT)
 
 # Inserts games from the list into the Listbox
 with open("test.json", "r") as input_file:
     games_list = json.load(input_file)
     for game in games_list:
+        games.append(game)
         listbox.insert(tk.END, game["title"])
 
+
+btn_delete = tk.Button(listbox_frame, text="Delete selected", command=delete_game)
+btn_delete.pack(pady=5)
 
 # Main frame
 main_frame = tk.Frame()
