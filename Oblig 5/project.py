@@ -23,7 +23,10 @@ def add_game():
     developer = ent_add_dev.get()
     image = ent_add_img.get()
 
-    games.append(Game(title, genre, release, score, developer, image).__dict__)
+    if not title:
+        tk.messagebox.showerror("Error", "You can not create a blank game. At the least, it needs a title.")
+    else:
+        games.append(Game(title, genre, release, score, developer, image).__dict__)
 
     ent_add_title.delete(0, tk.END)
     ent_add_genre.delete(0, tk.END)
@@ -44,12 +47,15 @@ def edit_game(*args):
     except IndexError:
         tk.messagebox.showerror("Error", "Could not edit entry, please select a game from the list and try again.")
     else:
-        games[index]["title"] = ent_edit_title.get()
-        games[index]["genre"] = ent_edit_genre.get()
-        games[index]["release"] = ent_edit_release.get()
-        games[index]["score"] = ent_edit_score.get()
-        games[index]["developer"] = ent_edit_dev.get()
-        games[index]["image"] = ent_edit_img.get()
+        if not ent_edit_title.get():
+            tk.messagebox.showerror("Error", "The title cannot be blank.")
+        else:
+            games[index]["title"] = ent_edit_title.get()
+            games[index]["genre"] = ent_edit_genre.get()
+            games[index]["release"] = ent_edit_release.get()
+            games[index]["score"] = ent_edit_score.get()
+            games[index]["developer"] = ent_edit_dev.get()
+            games[index]["image"] = ent_edit_img.get()
 
         save_to_file()
         display_game_info()
