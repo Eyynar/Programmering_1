@@ -1,15 +1,17 @@
 [
     {
         "title": "The Outer Wilds",
-        "release": 2019,
-        "score": 10,
-        "developer": "blank",
+        "genre": "Space/Puzzle",
+        "release": "2019",
+        "score": "10",
+        "developer": "Develop",
         "image": "images/theouterwilds.jpg"
     },
     {
         "title": "Hollow Knight",
-        "release": 2017,
-        "score": 10,
+        "genre": "Metroidvania",
+        "release": "2017",
+        "score": "100",
         "developer": "Team Cherry",
         "image": "images/hollowknight.jpg"
     }
