@@ -63,7 +63,16 @@ def display_game_info(*args):
         game_key = listbox_info.curselection()[0]
         selected_game = games[game_key]
     except IndexError:
-        selected_game = games[0]
+        if games:
+            selected_game = games[0]
+        else:
+            selected_game = {}
+    else:
+        title_text.set(selected_game['title'])
+        genre_text.set(selected_game['genre'])
+        release_text.set(selected_game['release'])
+        score_text.set(selected_game['score'])
+        dev_text.set(selected_game['developer'])
 
     try:
         img_path = ImageTk.PhotoImage(Image.open(selected_game["image"]))
@@ -71,13 +80,10 @@ def display_game_info(*args):
         img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
     except PermissionError:
         img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
-
-    canvas.itemconfigure(cover_img, image=img_path)
-    title_text.set(selected_game['title'])
-    genre_text.set(selected_game['genre'])
-    release_text.set(selected_game['release'])
-    score_text.set(selected_game['score'])
-    dev_text.set(selected_game['developer'])
+    except KeyError:
+        img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+    finally:
+        canvas.itemconfigure(cover_img, image=img_path)
 
 
 def display_edit_info(*args):
@@ -195,12 +201,17 @@ update_listbox(listbox_info)
 info_frame = tk.Frame(main_frame)
 
 # Cover
-canvas = tk.Canvas(info_frame, width=225, height=225)
+canvas = tk.Canvas(info_frame, width=256, height=256)
 try:
     img_path = ImageTk.PhotoImage(Image.open(games[0]["image"]))
 except FileNotFoundError:
     img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
-cover_img = canvas.create_image(0, 0, anchor="nw", image=img_path)
+except IndexError:
+    img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+except PermissionError:
+    img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+finally:
+    cover_img = canvas.create_image(128, 128, anchor="center", image=img_path)
 
 # Labels
 lbl_title = tk.Label(info_frame, text="Title:")
@@ -242,11 +253,14 @@ ent_dev.grid(row=5, column=1)
 info_frame.pack()
 
 # Inserts details from the first game onto the page on startup.
-title_text.set(games[0]['title'])
-genre_text.set(games[0]['genre'])
-release_text.set(games[0]['release'])
-score_text.set(games[0]['score'])
-dev_text.set(games[0]['developer'])
+try:
+    title_text.set(games[0]['title'])
+    genre_text.set(games[0]['genre'])
+    release_text.set(games[0]['release'])
+    score_text.set(games[0]['score'])
+    dev_text.set(games[0]['developer'])
+except IndexError:
+    pass
 
 
 # -----------Widgets for the "Add games" page-----------
@@ -261,7 +275,7 @@ lbl_add_genre = tk.Label(add_form_frame, text="Genre:")
 lbl_add_release = tk.Label(add_form_frame, text="Release date:")
 lbl_add_score = tk.Label(add_form_frame, text="Review score:")
 lbl_add_dev = tk.Label(add_form_frame, text="Developer:")
-lbl_add_img = tk.Label(add_form_frame, text="Image path: \n225x225")
+lbl_add_img = tk.Label(add_form_frame, text="Image path: \n256x256")
 
 # Entries
 ent_add_title = tk.Entry(add_form_frame)
