@@ -14,5 +14,13 @@
         "score": "10",
         "developer": "Team Cherry",
         "image": "images/hollowknight.jpg"
+    },
+    {
+        "title": "Elden Ring",
+        "genre": "Soulss",
+        "release": "2022",
+        "score": "??",
+        "developer": "Fromsoftware",
+        "image": "images/eldenring.jpg"
     }
 ]
