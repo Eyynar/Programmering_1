@@ -67,7 +67,7 @@ def display_game_info(*args):
             selected_game = dict(games[0])
         else:
             selected_game = {}
-    else:
+    finally:
         title_text.set(selected_game['title'])
         genre_text.set(selected_game['genre'])
         release_text.set(selected_game['release'])
