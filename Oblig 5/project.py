@@ -40,7 +40,7 @@ def add_game():
 
 def edit_game(*args):
     try:
-        index = listbox_edit.curselection()[0]
+        index = int(listbox_edit.curselection()[0])
     except IndexError:
         tk.messagebox.showerror("Error", "Could not edit entry, please select a game from the list and try again.")
     else:
@@ -61,10 +61,10 @@ def display_game_info(*args):
     global img_path
     try:
         game_key = listbox_info.curselection()[0]
-        selected_game = games[game_key]
+        selected_game = dict(games[game_key])
     except IndexError:
         if games:
-            selected_game = games[0]
+            selected_game = dict(games[0])
         else:
             selected_game = {}
     else:
@@ -77,11 +77,11 @@ def display_game_info(*args):
     try:
         img_path = ImageTk.PhotoImage(Image.open(selected_game["image"]))
     except FileNotFoundError:
-        img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+        img_path = ImageTk.PhotoImage(Image.open(error_image))
     except PermissionError:
-        img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+        img_path = ImageTk.PhotoImage(Image.open(error_image))
     except KeyError:
-        img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+        img_path = ImageTk.PhotoImage(Image.open(error_image))
     finally:
         canvas.itemconfigure(cover_img, image=img_path)
 
@@ -89,7 +89,7 @@ def display_game_info(*args):
 def display_edit_info(*args):
     try:
         game_key = listbox_edit.curselection()[0]
-        selected_game = games[game_key]
+        selected_game = dict(games[game_key])
 
         ent_edit_title.delete(0, tk.END)
         ent_edit_title.insert(0, selected_game['title'])
@@ -142,6 +142,7 @@ def update_listbox(listbox):
 
 # List that contains all stored games
 games = []
+error_image = "images/error.png"
 
 with open("test.json", "r") as input_file:
     games_list = json.load(input_file)
@@ -149,6 +150,7 @@ for game in games_list:
     games.append(game)
 
 window = tk.Tk()
+window.title("Games database")
 window.resizable(False, False)
 
 # The parent for all tabs
@@ -205,11 +207,11 @@ canvas = tk.Canvas(info_frame, width=256, height=256)
 try:
     img_path = ImageTk.PhotoImage(Image.open(games[0]["image"]))
 except FileNotFoundError:
-    img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+    img_path = ImageTk.PhotoImage(Image.open(error_image))
 except IndexError:
-    img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+    img_path = ImageTk.PhotoImage(Image.open(error_image))
 except PermissionError:
-    img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+    img_path = ImageTk.PhotoImage(Image.open(error_image))
 finally:
     cover_img = canvas.create_image(128, 128, anchor="center", image=img_path)
 
@@ -272,7 +274,7 @@ add_form_frame = tk.Frame(add_frame)
 # Labels
 lbl_add_title = tk.Label(add_form_frame, text="Title:")
 lbl_add_genre = tk.Label(add_form_frame, text="Genre:")
-lbl_add_release = tk.Label(add_form_frame, text="Release date:")
+lbl_add_release = tk.Label(add_form_frame, text="Release year:")
 lbl_add_score = tk.Label(add_form_frame, text="Review score:")
 lbl_add_dev = tk.Label(add_form_frame, text="Developer:")
 lbl_add_img = tk.Label(add_form_frame, text="Image path: \n256x256")
