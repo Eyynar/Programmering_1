@@ -17,48 +17,87 @@ class Game:
 def add_game(title, genre, release, score, developer, image):
     games.append(Game(title, genre, release, score, developer, image).__dict__)
     save_to_file()
+    update_listbox(listbox_info)
+    update_listbox(listbox_edit)
 
 
 def edit_game(*args):
     try:
-        index = listbox.curselection()[0]
+        index = listbox_edit.curselection()[0]
+
+        new_title = ent_edit_title.get()
+        new_genre = ent_edit_genre.get()
+        new_release = ent_edit_release.get()
+        new_score = ent_edit_score.get()
+        new_developer = ent_edit_dev.get()
+        new_image = ent_edit_img.get()
+
+        games[index]["title"] = new_title
+        games[index]["genre"] = new_genre
+        games[index]["release"] = new_release
+        games[index]["score"] = new_score
+        games[index]["developer"] = new_developer
+        games[index]["image"] = new_image
+        save_to_file()
+        display_game_info()
+        update_listbox(listbox_info)
+        update_listbox(listbox_edit)
     except IndexError:
-        index = 0
-
-    new_title = ent_title.get()
-    new_genre = ent_genre.get()
-    new_release = ent_release.get()
-    new_score = ent_score.get()
-    new_developer = ent_dev.get()
-    # new_image = ent_ima.get()
-
-    games[index]["title"] = new_title
-    games[index]["genre"] = new_genre
-    games[index]["release"] = new_release
-    games[index]["score"] = new_score
-    games[index]["developer"] = new_developer
-    # games[index]["image"] = new_image
-    save_to_file()
+        pass
 
 
-def display_game(*args):
+def display_game_info(*args):
     global img_path
-    game_key = listbox.curselection()[0]
-    game = games_list[game_key]
+    global game_key
+    try:
+        game_key = listbox_info.curselection()[0]
+        selected_game = games_list[game_key]
+    except IndexError:
+        selected_game = games_list[0]
+        game_key = 0
 
-    img_path = ImageTk.PhotoImage(Image.open(games_list[game_key]["image"]))
+    try:
+        img_path = ImageTk.PhotoImage(Image.open(games_list[game_key]["image"]))
+    except FileNotFoundError:
+        img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+
     canvas.itemconfigure(cover_img, image=img_path)
+    title_text.set(selected_game['title'])
+    genre_text.set(selected_game['genre'])
+    release_text.set(selected_game['release'])
+    score_text.set(selected_game['score'])
+    dev_text.set(selected_game['developer'])
 
-    ent_title.delete(0, tk.END)
-    ent_title.insert(0, game['title'])
-    ent_genre.delete(0, tk.END)
-    ent_genre.insert(0, game['genre'])
-    ent_release.delete(0, tk.END)
-    ent_release.insert(0, game['release'])
-    ent_score.delete(0, tk.END)
-    ent_score.insert(0, game['score'])
-    ent_dev.delete(0, tk.END)
-    ent_dev.insert(0, game['developer'])
+
+def display_edit_info(*args):
+    global game_key
+    try:
+        game_key = listbox_edit.curselection()[0]
+        selected_game = games_list[game_key]
+
+        ent_edit_title.delete(0, tk.END)
+        ent_edit_title.insert(0, selected_game['title'])
+        ent_edit_genre.delete(0, tk.END)
+        ent_edit_genre.insert(0, selected_game['genre'])
+        ent_edit_release.delete(0, tk.END)
+        ent_edit_release.insert(0, selected_game['release'])
+        ent_edit_score.delete(0, tk.END)
+        ent_edit_score.insert(0, selected_game['score'])
+        ent_edit_dev.delete(0, tk.END)
+        ent_edit_dev.insert(0, selected_game['developer'])
+        ent_edit_img.delete(0, tk.END)
+        ent_edit_img.insert(0, selected_game['image'])
+    except IndexError:
+        pass
+
+
+def clear_edit(*args):
+    ent_edit_title.delete(0, tk.END)
+    ent_edit_genre.delete(0, tk.END)
+    ent_edit_release.delete(0, tk.END)
+    ent_edit_score.delete(0, tk.END)
+    ent_edit_dev.delete(0, tk.END)
+    ent_edit_img.delete(0, tk.END)
 
 
 def save_to_file():
@@ -67,17 +106,33 @@ def save_to_file():
 
 
 def delete_game():
+    global game_key
     try:
-        game_key = listbox.curselection()[0]
+        game_key = listbox_info.curselection()[0]
         del games[game_key]
-        listbox.delete(game_key)
+        listbox_info.delete(game_key)
         save_to_file()
     except IndexError:
         pass
+    update_listbox(listbox_info)
+    update_listbox(listbox_edit)
+
+
+def update_listbox(listbox):
+    listbox.delete(0, tk.END)
+    for game in games_list:
+        listbox.insert(tk.END, game["title"])
 
 
 # List that contains all stored games
 games = []
+game_key = 0
+
+with open("test.json", "r") as input_file:
+    games_list = json.load(input_file)
+
+for game in games_list:
+    games.append(game)
 
 window = tk.Tk()
 window.resizable(False, False)
@@ -88,9 +143,12 @@ frame_parent = ttk.Notebook(window)
 # Main and info tabs
 main_frame = tk.Frame(frame_parent)
 add_frame = tk.Frame(frame_parent)
+edit_frame = tk.Frame(frame_parent)
 
 frame_parent.add(main_frame, text="All games")
-frame_parent.add(add_frame, text="Add games")
+frame_parent.add(add_frame, text="Add game")
+frame_parent.add(edit_frame, text="Edit games")
+frame_parent.bind("<<NotebookTabChanged>>", clear_edit)
 
 frame_parent.pack(fill=tk.BOTH, expand=1)
 
@@ -100,30 +158,25 @@ listbox_frame = tk.Frame(main_frame)
 listbox_frame.pack(side=tk.LEFT)
 
 # Listbox
-listbox = tk.Listbox(listbox_frame, height=20)
-listbox.bind("<<ListboxSelect>>", display_game)
+listbox_info = tk.Listbox(listbox_frame, height=20)
+listbox_info.bind("<<ListboxSelect>>", display_game_info)
 
 # Listbox scrollbar
 listbox_scrollbar = tk.Scrollbar(listbox_frame)
 
-listbox.config(yscrollcommand=listbox_scrollbar.set)
-listbox_scrollbar.config(command=listbox.yview)
+listbox_info.config(yscrollcommand=listbox_scrollbar.set)
+listbox_scrollbar.config(command=listbox_info.yview)
 
 # Delete button
 btn_delete = tk.Button(listbox_frame, text="Delete selected", command=delete_game)
 
 # Placing the widgets in the grid
-listbox.grid(row=0, column=0)
+listbox_info.grid(row=0, column=0)
 listbox_scrollbar.grid(row=0, column=1, sticky="NS")
 btn_delete.grid(row=1, column=0)
 
-
 # Inserts games from the list into the Listbox
-with open("test.json", "r") as input_file:
-    games_list = json.load(input_file)
-    for game in games_list:
-        games.append(game)
-        listbox.insert(tk.END, game["title"])
+update_listbox(listbox_info)
 
 
 # Frame that contains all the game info
@@ -141,15 +194,18 @@ lbl_release = tk.Label(info_frame, text="Released:")
 lbl_score = tk.Label(info_frame, text="Score:")
 lbl_dev = tk.Label(info_frame, text="Developed by:")
 
-# Form entries
-ent_title = tk.Entry(info_frame)
-ent_genre = tk.Entry(info_frame)
-ent_release = tk.Entry(info_frame)
-ent_score = tk.Entry(info_frame)
-ent_dev = tk.Entry(info_frame)
+title_text = tk.StringVar()
+genre_text = tk.StringVar()
+release_text = tk.StringVar()
+score_text = tk.StringVar()
+dev_text = tk.StringVar()
 
-# Save button
-btn_save = tk.Button(info_frame, text="Save", command=edit_game)
+# Form entries
+ent_title = tk.Entry(info_frame, state="readonly", textvariable=title_text)
+ent_genre = tk.Entry(info_frame, state="readonly", textvariable=genre_text)
+ent_release = tk.Entry(info_frame, state="readonly", textvariable=release_text)
+ent_score = tk.Entry(info_frame, state="readonly", textvariable=score_text)
+ent_dev = tk.Entry(info_frame, state="readonly", textvariable=dev_text)
 
 # Positioning all of the elements in the grid.
 canvas.grid(row=0, column=0, columnspan=2)
@@ -163,19 +219,115 @@ ent_genre.grid(row=2, column=1)
 ent_release.grid(row=3, column=1)
 ent_score.grid(row=4, column=1)
 ent_dev.grid(row=5, column=1)
-btn_save.grid(row=6, column=0, columnspan=2)
 
 info_frame.pack()
 
 # Inserts details form the first game onto the page.
-ent_title.insert(0, games[0]['title'])
-ent_genre.insert(0, games[0]['genre'])
-ent_release.insert(0, games[0]['release'])
-ent_score.insert(0, games[0]['score'])
-ent_dev.insert(0, games[0]['developer'])
+title_text.set(games[0]['title'])
+genre_text.set(games[0]['genre'])
+release_text.set(games[0]['release'])
+score_text.set(games[0]['score'])
+dev_text.set(games[0]['developer'])
 
 
 # Widgets for the "Add games" page
-form_frame = tk.Frame(add_frame)
+add_form_frame = tk.Frame(add_frame)
+add_form_frame.pack()
+
+# Labels
+lbl_add_title = tk.Label(add_form_frame, text="Title:")
+lbl_add_genre = tk.Label(add_form_frame, text="Genre:")
+lbl_add_release = tk.Label(add_form_frame, text="Release date:")
+lbl_add_score = tk.Label(add_form_frame, text="Review score:")
+lbl_add_dev = tk.Label(add_form_frame, text="Developer:")
+
+# Entries
+ent_add_title = tk.Entry(add_form_frame)
+ent_add_genre = tk.Entry(add_form_frame)
+ent_add_release = tk.Entry(add_form_frame)
+ent_add_score = tk.Entry(add_form_frame)
+ent_add_dev = tk.Entry(add_form_frame)
+
+# Add button
+btn_add_game = tk.Button(add_form_frame, text="Add game", command=add_game)
+
+# Grid placement
+lbl_add_title.grid(row=0, column=0)
+lbl_add_genre.grid(row=1, column=0)
+lbl_add_release.grid(row=2, column=0)
+lbl_add_score.grid(row=3, column=0)
+lbl_add_dev.grid(row=4, column=0)
+ent_add_title.grid(row=0, column=1)
+ent_add_genre.grid(row=1, column=1)
+ent_add_release.grid(row=2, column=1)
+ent_add_score.grid(row=3, column=1)
+ent_add_dev.grid(row=4, column=1)
+btn_add_game.grid(row=5, column=0, columnspan=2)
+
+
+# Widgets for the "Edit games" page
+listbox_edit_frame = tk.Frame(edit_frame)
+listbox_edit_frame.pack(side=tk.LEFT)
+
+# Listbox
+listbox_edit = tk.Listbox(listbox_edit_frame, height=20)
+listbox_edit.bind("<<ListboxSelect>>", display_edit_info)
+
+# Listbox scrollbar
+listbox_edit_scrollbar = tk.Scrollbar(listbox_edit_frame)
+
+listbox_edit.config(yscrollcommand=listbox_edit_scrollbar.set)
+listbox_edit_scrollbar.config(command=listbox_edit.yview)
+
+# Placing the widgets in the grid
+listbox_edit.grid(row=0, column=0)
+listbox_edit_scrollbar.grid(row=0, column=1, sticky="NS")
+
+update_listbox(listbox_edit)
+
+# Frame for the edit form
+edit_form_frame = tk.Frame(edit_frame)
+edit_form_frame.pack()
+
+# Labels
+lbl_edit_title = tk.Label(edit_form_frame, text="Title:")
+lbl_edit_genre = tk.Label(edit_form_frame, text="Genre:")
+lbl_edit_release = tk.Label(edit_form_frame, text="Released:")
+lbl_edit_score = tk.Label(edit_form_frame, text="Score:")
+lbl_edit_dev = tk.Label(edit_form_frame, text="Developed by:")
+lbl_edit_img = tk.Label(edit_form_frame, text="Image path:")
+
+# Entries
+ent_edit_title = tk.Entry(edit_form_frame)
+ent_edit_genre = tk.Entry(edit_form_frame)
+ent_edit_release = tk.Entry(edit_form_frame)
+ent_edit_score = tk.Entry(edit_form_frame)
+ent_edit_dev = tk.Entry(edit_form_frame)
+ent_edit_img = tk.Entry(edit_form_frame)
+
+# Save button
+btn_edit_game = tk.Button(edit_form_frame, text="Save", command=edit_game)
+
+ent_edit_title.insert(0, games[0]['title'])
+ent_edit_genre.insert(0, games[0]['genre'])
+ent_edit_release.insert(0, games[0]['release'])
+ent_edit_score.insert(0, games[0]['score'])
+ent_edit_dev.insert(0, games[0]['developer'])
+ent_edit_img.insert(0, games[0]['image'])
+
+# Grid placement
+lbl_edit_title.grid(row=0, column=0)
+lbl_edit_genre.grid(row=1, column=0)
+lbl_edit_release.grid(row=2, column=0)
+lbl_edit_score.grid(row=3, column=0)
+lbl_edit_dev.grid(row=4, column=0)
+lbl_edit_img.grid(row=5, column=0)
+ent_edit_title.grid(row=0, column=1)
+ent_edit_genre.grid(row=1, column=1)
+ent_edit_release.grid(row=2, column=1)
+ent_edit_score.grid(row=3, column=1)
+ent_edit_dev.grid(row=4, column=1)
+ent_edit_img.grid(row=5, column=1)
+btn_edit_game.grid(row=6, column=0, columnspan=2)
 
 window.mainloop()
