@@ -23,7 +23,10 @@ def add_game():
     developer = ent_add_dev.get()
     image = ent_add_img.get()
 
-    games.append(Game(title, genre, release, score, developer, image).__dict__)
+    if not title:
+        tk.messagebox.showerror("Error", "You can not create a blank game. At the least, it needs a title.")
+    else:
+        games.append(Game(title, genre, release, score, developer, image).__dict__)
 
     ent_add_title.delete(0, tk.END)
     ent_add_genre.delete(0, tk.END)
@@ -40,16 +43,19 @@ def add_game():
 
 def edit_game(*args):
     try:
-        index = listbox_edit.curselection()[0]
+        index = int(listbox_edit.curselection()[0])
     except IndexError:
         tk.messagebox.showerror("Error", "Could not edit entry, please select a game from the list and try again.")
     else:
-        games[index]["title"] = ent_edit_title.get()
-        games[index]["genre"] = ent_edit_genre.get()
-        games[index]["release"] = ent_edit_release.get()
-        games[index]["score"] = ent_edit_score.get()
-        games[index]["developer"] = ent_edit_dev.get()
-        games[index]["image"] = ent_edit_img.get()
+        if not ent_edit_title.get():
+            tk.messagebox.showerror("Error", "The title cannot be blank.")
+        else:
+            games[index]["title"] = ent_edit_title.get()
+            games[index]["genre"] = ent_edit_genre.get()
+            games[index]["release"] = ent_edit_release.get()
+            games[index]["score"] = ent_edit_score.get()
+            games[index]["developer"] = ent_edit_dev.get()
+            games[index]["image"] = ent_edit_img.get()
 
         save_to_file()
         display_game_info()
@@ -61,29 +67,35 @@ def display_game_info(*args):
     global img_path
     try:
         game_key = listbox_info.curselection()[0]
-        selected_game = games[game_key]
+        selected_game = dict(games[game_key])
     except IndexError:
-        selected_game = games[0]
+        if games:
+            selected_game = dict(games[0])
+        else:
+            selected_game = {}
+    finally:
+        title_text.set(selected_game['title'])
+        genre_text.set(selected_game['genre'])
+        release_text.set(selected_game['release'])
+        score_text.set(selected_game['score'])
+        dev_text.set(selected_game['developer'])
 
     try:
         img_path = ImageTk.PhotoImage(Image.open(selected_game["image"]))
     except FileNotFoundError:
-        img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
+        img_path = ImageTk.PhotoImage(Image.open(error_image))
     except PermissionError:
-        img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
-
-    canvas.itemconfigure(cover_img, image=img_path)
-    title_text.set(selected_game['title'])
-    genre_text.set(selected_game['genre'])
-    release_text.set(selected_game['release'])
-    score_text.set(selected_game['score'])
-    dev_text.set(selected_game['developer'])
+        img_path = ImageTk.PhotoImage(Image.open(error_image))
+    except KeyError:
+        img_path = ImageTk.PhotoImage(Image.open(error_image))
+    finally:
+        canvas.itemconfigure(cover_img, image=img_path)
 
 
 def display_edit_info(*args):
     try:
         game_key = listbox_edit.curselection()[0]
-        selected_game = games[game_key]
+        selected_game = dict(games[game_key])
 
         ent_edit_title.delete(0, tk.END)
         ent_edit_title.insert(0, selected_game['title'])
@@ -136,6 +148,7 @@ def update_listbox(listbox):
 
 # List that contains all stored games
 games = []
+error_image = "images/error.png"
 
 with open("test.json", "r") as input_file:
     games_list = json.load(input_file)
@@ -143,6 +156,7 @@ for game in games_list:
     games.append(game)
 
 window = tk.Tk()
+window.title("Games database")
 window.resizable(False, False)
 
 # The parent for all tabs
@@ -195,12 +209,17 @@ update_listbox(listbox_info)
 info_frame = tk.Frame(main_frame)
 
 # Cover
-canvas = tk.Canvas(info_frame, width=225, height=225)
+canvas = tk.Canvas(info_frame, width=256, height=256)
 try:
     img_path = ImageTk.PhotoImage(Image.open(games[0]["image"]))
 except FileNotFoundError:
-    img_path = ImageTk.PhotoImage(Image.open("images/error.png"))
-cover_img = canvas.create_image(0, 0, anchor="nw", image=img_path)
+    img_path = ImageTk.PhotoImage(Image.open(error_image))
+except IndexError:
+    img_path = ImageTk.PhotoImage(Image.open(error_image))
+except PermissionError:
+    img_path = ImageTk.PhotoImage(Image.open(error_image))
+finally:
+    cover_img = canvas.create_image(128, 128, anchor="center", image=img_path)
 
 # Labels
 lbl_title = tk.Label(info_frame, text="Title:")
@@ -242,11 +261,14 @@ ent_dev.grid(row=5, column=1)
 info_frame.pack()
 
 # Inserts details from the first game onto the page on startup.
-title_text.set(games[0]['title'])
-genre_text.set(games[0]['genre'])
-release_text.set(games[0]['release'])
-score_text.set(games[0]['score'])
-dev_text.set(games[0]['developer'])
+try:
+    title_text.set(games[0]['title'])
+    genre_text.set(games[0]['genre'])
+    release_text.set(games[0]['release'])
+    score_text.set(games[0]['score'])
+    dev_text.set(games[0]['developer'])
+except IndexError:
+    pass
 
 
 # -----------Widgets for the "Add games" page-----------
@@ -258,10 +280,10 @@ add_form_frame = tk.Frame(add_frame)
 # Labels
 lbl_add_title = tk.Label(add_form_frame, text="Title:")
 lbl_add_genre = tk.Label(add_form_frame, text="Genre:")
-lbl_add_release = tk.Label(add_form_frame, text="Release date:")
+lbl_add_release = tk.Label(add_form_frame, text="Release year:")
 lbl_add_score = tk.Label(add_form_frame, text="Review score:")
 lbl_add_dev = tk.Label(add_form_frame, text="Developer:")
-lbl_add_img = tk.Label(add_form_frame, text="Image path: \n225x225")
+lbl_add_img = tk.Label(add_form_frame, text="Image path: \n256x256")
 
 # Entries
 ent_add_title = tk.Entry(add_form_frame)

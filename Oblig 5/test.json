@@ -1,10 +1,10 @@
 [
     {
         "title": "The Outer Wilds",
-        "genre": "Metroidvania",
+        "genre": "Space",
         "release": "2019",
         "score": "10",
-        "developer": "noen",
+        "developer": "Mobius Digital",
         "image": "images/theouterwilds.jpg"
     },
     {
@@ -17,10 +17,34 @@
     },
     {
         "title": "Elden Ring",
-        "genre": "Soulss",
+        "genre": "Souls",
         "release": "2022",
         "score": "??",
         "developer": "Fromsoftware",
         "image": "images/eldenring.jpg"
+    },
+    {
+        "title": "Celeste",
+        "genre": "Platformer",
+        "release": "2018",
+        "score": "10",
+        "developer": "Matt Makes Games",
+        "image": "images/celeste.jpg"
+    },
+    {
+        "title": "Ori and the Blind Forest",
+        "genre": "Metroidvania",
+        "release": "2015",
+        "score": "10",
+        "developer": "Moon Studios",
+        "image": "images/oritbf.jpg"
+    },
+    {
+        "title": "Ori and the Will of the Wisps",
+        "genre": "Metroidvania",
+        "release": "2020",
+        "score": "10",
+        "developer": "Moon Studios",
+        "image": "images/oriwotw.jpg"
     }
 ]
