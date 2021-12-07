@@ -1,4 +1,5 @@
 import json
+import random
 
 with open("planets.json", "r") as file:
     planets_file = json.load(file)
@@ -15,3 +16,4 @@ json_string = '''{
 
 dog = json.loads(json_string)
 print(f"{dog['name']} is a {dog['animal']}")
+random.randint(a, b)
